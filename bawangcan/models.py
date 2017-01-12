@@ -7,6 +7,7 @@ class User(models.Model):
     user_email = models.CharField(blank=False, null=False, max_length=255)
     user_password = models.CharField(blank=False, null=False, max_length=255)
     user_id = models.CharField(blank=False, null=False, max_length=255, unique=True)
+    user_money=models.IntegerField(blank=False,null=False)
 
 
 class BawangcanActivity(models.Model):
@@ -14,5 +15,6 @@ class BawangcanActivity(models.Model):
     activity_type = models.IntegerField(blank=False, null=False)
     activity_id = models.CharField(blank=False, null=False, max_length=255)
 
-class BawangcanRecord(models.Model)
+
+class BawangcanRecord(models.Model):
     pass
