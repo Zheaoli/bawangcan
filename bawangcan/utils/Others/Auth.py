@@ -32,7 +32,6 @@
 #               佛祖保佑         永无BUG
 from bawangcan.models import User
 from bawangcan.utils.DataBase import RedisBase
-from redis import client
 import hashlib
 from conf.MyRedis import *
 from .ConvertTime import str_to_num
