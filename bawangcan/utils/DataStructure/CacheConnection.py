@@ -34,7 +34,7 @@ import weakref
 
 
 class CacheConnection(type):
-    def __init__(self, cls, name, bases, dict):
+    def __init__(cls, name, bases, dict1):
         __getattribute__o = cls.__getattribute__
 
         def __getattribute__(self, *args, **kwargs):
@@ -42,8 +42,8 @@ class CacheConnection(type):
             return __getattribute__o(self, *args, **kwargs)
 
         cls.__getattribute__ = __getattribute__
-        super().__init__(cls, name, bases, dict)
-        self.__cache = weakref.WeakValueDictionary()
+        cls.__cache = weakref.WeakValueDictionary()
+        type.__init__(cls, name, bases, dict1)
 
     def __call__(self, *args, **kwargs):
         if kwargs['database'] in self.__cache:

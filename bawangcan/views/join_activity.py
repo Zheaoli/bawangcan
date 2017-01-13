@@ -41,6 +41,7 @@ from bawangcan.utils.Others import RequestCheck
 from bawangcan.utils.Others import ConvertTime
 import datetime
 import hashlib
+import json
 
 
 @csrf_exempt
@@ -79,10 +80,10 @@ def join_activity(request: request1):
         else:
             time_map = ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             if request.body['activity_id'] == 1 and (activity_object.status_count + 1) == 200:
-                BawangcanStatus.objects.raw("update set status_time={},set status_count=200,status_status=1 where "
+                BawangcanStatus.objects.raw("update set status_end_time={},status_count=200,status_status=1 where "
                                             "status_activity_id=".format(time_map))
             elif request.body['activity_id'] == 0 and (activity_object.status_count + 1) == 20:
-                BawangcanStatus.objects.raw("update set status_time={},set status_count=200,status_status=1 where "
+                BawangcanStatus.objects.raw("update set status_end_time={},status_count=200,status_status=1 where "
                                             "status_activity_id=".format(time_map))
             else:
                 BawangcanStatus.objects.raw("update set status_count={} where "
@@ -94,7 +95,7 @@ def join_activity(request: request1):
         User.objects.raw(
             'update bawangcan_user set user_money={} where user_id={}'.format(user_money, request.body['user_id']))
     except Exception as e:
-        pass
+        User.objects.raw("ROLLBACK Transaction")
     else:
         User.objects.raw('Commit Transaction')
-        return
+        return HttpResponse(json.dumps({'code': 0000, 'msg': '成功'}))

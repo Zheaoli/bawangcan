@@ -31,7 +31,8 @@
 #
 #               佛祖保佑         永无BUG
 from django.conf.urls import url
+from .views import join_activity
 
 urlpatterns = [
-    url(r'^api', include('bawangcan.urls'))
+    url(r'^join_activity/', join_activity.join_activity)
 ]
