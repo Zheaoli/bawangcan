@@ -82,7 +82,9 @@ def check_key(keyword=None):
                 return HttpResponse(json.dumps(re), content_type="application/json")
 
         return wrap
+
     return wrap1
+
 
 def sql_check(func):
     @wraps(func)

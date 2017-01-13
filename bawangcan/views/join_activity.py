@@ -24,7 +24,7 @@ from bawangcan.utils.Others import RequestCheck
 
 
 @csrf_exempt
-@RequestCheck.check_key
+@RequestCheck.check_key('user_id')
 @RequestCheck.sql_check
 def join_activity(request: request1):
     """

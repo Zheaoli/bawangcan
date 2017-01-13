@@ -19,7 +19,7 @@ from bawangcan.utils.Others import RequestCheck
 
 
 @csrf_exempt
-@RequestCheck.check_key
+@RequestCheck.check_key('activity_id')
 @RequestCheck.sql_check
 def activity(request: request1):
     body_temp = json.loads(bytes.decode(request.body))
