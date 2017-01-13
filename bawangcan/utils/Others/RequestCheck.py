@@ -30,41 +30,59 @@
 #     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #               佛祖保佑         永无BUG
-from bawangcan.utils.DataBase import RedisBase
-from conf.MyRedis import *
-from functools import wraps
-from django.http import HttpResponse
 import json
+from functools import wraps
+
+from django.http import HttpResponse
 from django.http import request as request1
 
+from bawangcan.utils.DataBase import RedisBase
+from conf.MyRedis import *
 
-def check_key(f):
-    @wraps(f)
-    def wrap(request: request1, *args, **kwargs):
-        re = {}
-        if request.method == "POST":
-            temp_dict = json.loads(bytes.decode(request.body))
-            if 'key' in temp_dict and 'user_id' in temp_dict:
-                redis_client = RedisBase.RedisBase(host=host, port=port, database=db)
-                temp_check = redis_client.connection.get(temp_dict['email'].strip())
-                if temp_check is None:
-                    re['code'] = 56789
-                    re['msg'] = 'key已经失效，请重新登陆'
-                    return HttpResponse(json.dumps(re), content_type="application/json")
-                elif temp_dict['key'] == bytes.decode(temp_check):
-                    return f(request, *args, **kwargs)
+
+def check_key(keyword=None):
+    def wrap1(func):
+        @wraps(func)
+        def wrap(request: request1, *args, **kwargs):
+            re = {}
+            if request.method == "POST":
+                temp_dict = json.loads(bytes.decode(request.body))
+                if keyword is not None:
+                    if 'key' in temp_dict and 'user_id' in temp_dict and keyword in temp_dict:
+                        redis_client = RedisBase.RedisBase(host=host, port=port, database=db)
+                        temp_check = redis_client.connection.get(temp_dict['email'].strip())
+                        if temp_check is None:
+                            re['code'] = 56789
+                            re['msg'] = 'key已经失效，请重新登陆'
+                            return HttpResponse(json.dumps(re), content_type="application/json")
+                        elif temp_dict['key'] == bytes.decode(temp_check):
+                            return func(request, *args, **kwargs)
+                    else:
+                        re['code'] = 12345
+                        re['msg'] = '请带上 email 和 user_id'
+                        return HttpResponse(json.dumps(re), content_type="application/json")
+                else:
+                    if 'key' in temp_dict and 'user_id' in temp_dict:
+                        redis_client = RedisBase.RedisBase(host=host, port=port, database=db)
+                        temp_check = redis_client.connection.get(temp_dict['email'].strip())
+                        if temp_check is None:
+                            re['code'] = 56789
+                            re['msg'] = 'key已经失效，请重新登陆'
+                            return HttpResponse(json.dumps(re), content_type="application/json")
+                        elif temp_dict['key'] == bytes.decode(temp_check):
+                            return func(request, *args, **kwargs)
+                    else:
+                        re['code'] = 12345
+                        re['msg'] = '请带上 email 和 user_id'
+                        return HttpResponse(json.dumps(re), content_type="application/json")
+
             else:
-                re['code'] = 12345
-                re['msg'] = '请带上 email 和 user_id'
+                re['code'] = 23333
+                re['msg'] = "哎呀呀呀，请用 POST"
                 return HttpResponse(json.dumps(re), content_type="application/json")
 
-        else:
-            re['code'] = 23333
-            re['msg'] = "哎呀呀呀，请用 POST"
-            return HttpResponse(json.dumps(re), content_type="application/json")
-
-    return wrap
-
+        return wrap
+    return wrap1
 
 def sql_check(func):
     @wraps(func)

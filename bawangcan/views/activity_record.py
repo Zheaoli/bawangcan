@@ -22,12 +22,13 @@ from bawangcan.utils.Others import RequestCheck
 @RequestCheck.check_key
 @RequestCheck.sql_check
 def activity(request: request1):
+    body_temp = json.loads(bytes.decode(request.body))
     try:
         activity_object = None
         for p in BawangcanActivity.objects.raw(
                 "select MAX(activity_time),activity_id,activity_type from bawangcan_bawangcanactivity"
                 " where activity_type={} ORDER BY activity_time LIMIT 1".format(
-                    request.body['activity_id'])):
+                    body_temp['activity_id'])):
             activity_object = p
         templist = []
         for p in BawangcanRecord.objects.raw(
