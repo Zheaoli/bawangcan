@@ -48,6 +48,11 @@ import json
 @RequestCheck.check_key
 @RequestCheck.sql_check
 def join_activity(request: request1):
+    """
+
+    :param request:
+    :return:
+    """
     user_id = request.body['user_id']
     try:
         User.objects.raw("set autocommit=0")
@@ -96,6 +101,7 @@ def join_activity(request: request1):
             'update bawangcan_user set user_money={} where user_id={}'.format(user_money, request.body['user_id']))
     except Exception as e:
         User.objects.raw("ROLLBACK Transaction")
+        return HttpResponse(json.dumps({'code': 1001, 'msg': '活动参加失败'}))
     else:
         User.objects.raw('Commit Transaction')
         return HttpResponse(json.dumps({'code': 0000, 'msg': '成功'}))

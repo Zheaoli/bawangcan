@@ -30,6 +30,7 @@ class BawangcanRecord(models.Model):
     record_create_time = models.IntegerField(blank=False, null=False)
     record_user_id = models.CharField(blank=False, null=False, max_length=255)
 
+
 class BawangcanAward(models.Model):
     award_id = models.CharField(blank=False, null=False, max_length=255)
     award_user_id = models.CharField(blank=False, null=False, max_length=255)
