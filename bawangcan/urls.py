@@ -4,8 +4,8 @@
 @author: lizheao
 @contact: lizheao940510@gmail.com
 @software: PyCharm
-@file: ConvertTime.py
-@time: 21:10
+@file: urls.py
+@time: 11:00
 """
 #                       _oo0oo_
 #                      o8888888o
@@ -30,16 +30,8 @@
 #     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #               佛祖保佑         永无BUG
-import  time
-def str_to_num(time_str: object) -> object:
-    # type: (object) -> object
-    try:
-        if re.match("\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", time_str):
-            num_time = time.strptime(time_str, '%Y-%m-%d %H:%M:%S')
-            num = int(time.mktime(num_time) * 1000)
-            return num
-        else:
-            print("%s is error code form !", time_str)
-    except:
-        # log.error("str_to_num convert error !")
-        return ""
+from django.conf.urls import url
+
+urlpatterns = [
+    url(r'^api', include('bawangcan.urls'))
+]

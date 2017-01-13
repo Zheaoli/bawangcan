@@ -54,6 +54,6 @@ class UserAuth(object):
             redis_client = RedisBase.RedisBase(database=db, host=host, port=port)
             redis_client.connection.set(usertable.user_id, key_client.hexdigest())
             redis_client.connection.expire(time=10000, name=usertable.user_id)
-            return 0000, key_client.hexdigest()
+            return 0000, key_client.hexdigest(), usertable.user_id
         else:
-            return 10303, '密码错误'
+            return 10303, '密码错误',None

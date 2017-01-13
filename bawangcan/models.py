@@ -19,14 +19,19 @@ class BawangcanActivity(models.Model):
 class BawangcanStatus(models.Model):
     status_activity_id = models.CharField(blank=False, null=False, max_length=255)
     status_start_time = models.IntegerField(blank=False, null=False)
-    status_end_time = models.IntegerField(blank=False, null=False)
+    status_end_time = models.IntegerField(blank=False, null=True)
     status_count = models.IntegerField(blank=False, null=False)
     status_status = models.IntegerField(blank=False, null=False)
-    status_record_id = models.CharField(blank=False, null=False, max_length=255)
+    status_type = models.IntegerField(blank=False, null=False)
 
 
 class BawangcanRecord(models.Model):
     record_activity_id = models.CharField(blank=False, null=False, max_length=255)
     record_create_time = models.IntegerField(blank=False, null=False)
     record_user_id = models.CharField(blank=False, null=False, max_length=255)
-    record_record_id = models.CharField(blank=False, null=False, max_length=255)
+
+class BawangcanAward(models.Model):
+    award_id = models.CharField(blank=False, null=False, max_length=255)
+    award_user_id = models.CharField(blank=False, null=False, max_length=255)
+    award_activity_id = models.CharField(blank=False, null=False, max_length=255)
+    award_time = models.IntegerField(blank=False, null=False)

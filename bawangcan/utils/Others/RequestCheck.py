@@ -44,7 +44,7 @@ def check_key(f):
         re = {}
         if request.method == "POST":
             temp_dict = json.loads(bytes.decode(request.body))
-            if 'key' in temp_dict and 'email' in temp_dict:
+            if 'key' in temp_dict and 'user_id' in temp_dict:
                 redis_client = RedisBase.RedisBase(host=host, port=port, database=db)
                 temp_check = redis_client.connection.get(temp_dict['email'].strip())
                 if temp_check is None:
@@ -55,12 +55,20 @@ def check_key(f):
                     return f(request, *args, **kwargs)
             else:
                 re['code'] = 12345
-                re['msg'] = '请带上 email 和 key'
+                re['msg'] = '请带上 email 和 user_id'
                 return HttpResponse(json.dumps(re), content_type="application/json")
 
         else:
             re['code'] = 23333
-            re['msg'] = "Use Post ,你个阳光沙滩"
+            re['msg'] = "哎呀呀呀，请用 POST"
             return HttpResponse(json.dumps(re), content_type="application/json")
+
+    return wrap
+
+
+def sql_check(func):
+    @wraps(func)
+    def wrap(request: request1, *args, **kwargs):
+        func(request1, *args, **kwargs)
 
     return wrap
