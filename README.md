@@ -12,7 +12,7 @@
 
 第四 activity_record 获取当前活动状态
 
-第五 activity_record 获取用户中奖状态
+第五 activity_award 获取用户中奖状态
 
 ## 缺陷
 
@@ -24,4 +24,4 @@
 
 第四，没有设计日志系统
 
-第五，join_activity 没有编写单元测试（实际上是我不知道在带事物的情况下，单元测试怎样去构造 Test Case）
+第五，join_activity 没有编写单元测试（实际上是我不知道在带事务的情况下，单元测试怎样去构造 Test Case）

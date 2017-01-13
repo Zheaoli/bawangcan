@@ -7,34 +7,13 @@
 @file: user_login.py
 @time: 11:02
 """
-#                       _oo0oo_
-#                      o8888888o
-#                      88" . "88
-#                      (| -_- |)
-#                      0\  =  /0
-#                    ___/`---'\___
-#                  .' \\|     |// '.
-#                 / \\|||  :  |||// \
-#                / _||||| -:- |||||- \
-#               |   | \\\  -  /// |   |
-#               | \_|  ''\---/''  |_/ |
-#               \  .-\__  '-'  ___/-. /
-#             ___'. .'  /--.--\  `. .'___
-#          ."" '<  `.___\_<|>_/___.' >' "".
-#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-#         \  \ `_.   \_ __\ /__ _/   .-` /  /
-#     =====`-.____`.___ \_____/___.-`___.-'=====
-#                       `=---='
-#
-#
-#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#               佛祖保佑         永无BUG
+import json
+
 from django.http import HttpResponse
 from django.http import request as request1
 from django.views.decorators.csrf import csrf_exempt
+
 from bawangcan.utils.Others import Auth
-import json
 
 
 @csrf_exempt
@@ -73,6 +52,6 @@ def user_login(request: request1):
             print(e)
     else:
         re['code'] = 23333
-        re['msg'] = '白痴，用POST'
+        re['msg'] = '请用POST方法'
         re['key'] = None
         return HttpResponse(json.dumps(re), content_type='application/json')

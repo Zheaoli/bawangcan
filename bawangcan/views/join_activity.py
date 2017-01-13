@@ -7,41 +7,20 @@
 @file: join_activity.py
 @time: 11:08
 """
-#                       _oo0oo_
-#                      o8888888o
-#                      88" . "88
-#                      (| -_- |)
-#                      0\  =  /0
-#                    ___/`---'\___
-#                  .' \\|     |// '.
-#                 / \\|||  :  |||// \
-#                / _||||| -:- |||||- \
-#               |   | \\\  -  /// |   |
-#               | \_|  ''\---/''  |_/ |
-#               \  .-\__  '-'  ___/-. /
-#             ___'. .'  /--.--\  `. .'___
-#          ."" '<  `.___\_<|>_/___.' >' "".
-#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-#         \  \ `_.   \_ __\ /__ _/   .-` /  /
-#     =====`-.____`.___ \_____/___.-`___.-'=====
-#                       `=---='
-#
-#
-#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#               佛祖保佑         永无BUG
-from django.http import HttpResponse
-from django.http import request as request1
-from django.views.decorators.csrf import csrf_exempt
-from bawangcan.models import User
-from bawangcan.models import BawangcanActivity
-from bawangcan.models import BawangcanStatus
-from bawangcan.models import BawangcanRecord
-from bawangcan.utils.Others import RequestCheck
-from bawangcan.utils.Others import ConvertTime
 import datetime
 import hashlib
 import json
+
+from django.http import HttpResponse
+from django.http import request as request1
+from django.views.decorators.csrf import csrf_exempt
+
+from bawangcan.models import BawangcanActivity
+from bawangcan.models import BawangcanRecord
+from bawangcan.models import BawangcanStatus
+from bawangcan.models import User
+from bawangcan.utils.Others import ConvertTime
+from bawangcan.utils.Others import RequestCheck
 
 
 @csrf_exempt
@@ -105,3 +84,5 @@ def join_activity(request: request1):
     else:
         User.objects.raw('Commit Transaction')
         return HttpResponse(json.dumps({'code': 0000, 'msg': '成功'}))
+    finally:
+        User.objects.raw("set autocommit=1")
