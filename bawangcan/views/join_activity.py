@@ -38,7 +38,7 @@ def join_activity(request: request1):
             cursor.execute("Begin Transaction")
             user_object = None
             temp_flag = cursor.execute(
-                "update bawangcan_user set user_money=user_money-1 where user_id={}".format(user_id))
+                "update bawangcan_user set user_money=user_money-1 where user_id={} and user_money > 1".format(user_id))
             if temp_flag == 0:
                 raise ValueError("余额错误")
             activity_flag = None
