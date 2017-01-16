@@ -37,11 +37,12 @@ def join_activity(request: request1):
             cursor.execute("set autocommit=0")
             cursor.execute("Begin Transaction")
             user_object = None
-            temp_flag=cursor.execute("update bawangcan_user set user_money=user_money-1 where user_id={}".format(user_id))
-            if temp_flag==0:
+            temp_flag = cursor.execute(
+                "update bawangcan_user set user_money=user_money-1 where user_id={}".format(user_id))
+            if temp_flag == 0:
                 raise ValueError("余额错误")
             activity_flag = None
-            if body_temp['activity_id']==0:
+            if body_temp['activity_id'] == 0:
                 for p in BawangcanStatus.objects.raw(
                         "SELECT * FROM bawangcan_bawangcanstatus"
                         " WHERE status_type=0 AND status_count<20 AND status_status=0 FOR UPDATE "):
@@ -57,9 +58,9 @@ def join_activity(request: request1):
                     ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))))))
                 time_map = ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 cursor.execute("insert into bawangcan_bawangcanactivity (activity_time,activity_type,"
-                                              "activity_id) values({},{},{})".format(time_map,
-                                                                                     body_temp['activity_type'],
-                                                                                     activity_id_hash.hexdigest()))
+                               "activity_id) values({},{},{})".format(time_map,
+                                                                      body_temp['activity_type'],
+                                                                      activity_id_hash.hexdigest()))
                 cursor.execute(
                     "insert into bawangcan_bawangcanstatus (status_activity_id,status_start_time,"
                     "status_count,status_status,status_type) values({}.{}.{}.{}.{})".format(
@@ -72,13 +73,13 @@ def join_activity(request: request1):
                 time_map = ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 if body_temp['activity_id'] == 1 and (activity_flag.status_count + 1) == 200:
                     cursor.execute("update set status_end_time={},status_count=200,status_status=1 where "
-                                                "status_activity_id=".format(time_map))
+                                   "status_activity_id=".format(time_map))
                 elif body_temp['activity_id'] == 0 and (activity_flag.status_count + 1) == 20:
                     cursor.execute("update set status_end_time={},status_count=200,status_status=1 where "
-                                                "status_activity_id=".format(time_map))
+                                   "status_activity_id=".format(time_map))
                 else:
                     cursor.execute("update set status_count={} where "
-                                                "status_activity_id=".format(activity_flag.status_count + 1))
+                                   "status_activity_id=".format(activity_flag.status_count + 1))
                 cursor.execute(
                     "insert into bawangcan_bawangcanrecord (record_activity_id,record_create_time,record_user_id)"
                     " VALUES({},{},{})".format(
