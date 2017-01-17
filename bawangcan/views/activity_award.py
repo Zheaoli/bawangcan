@@ -13,7 +13,6 @@ from django.http import HttpResponse
 from django.http import request as request1
 from django.views.decorators.csrf import csrf_exempt
 
-from bawangcan.models import BawangcanAward
 from bawangcan.utils.Others import RequestCheck
 
 
