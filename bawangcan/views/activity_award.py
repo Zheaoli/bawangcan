@@ -9,10 +9,12 @@
 """
 import json
 
+from django.db import connection
 from django.http import HttpResponse
 from django.http import request as request1
 from django.views.decorators.csrf import csrf_exempt
 
+from bawangcan.utils.DataBase import NamedTupleFetch
 from bawangcan.utils.Others import RequestCheck
 
 
@@ -23,13 +25,16 @@ def activity(request: request1):
     body_temp = json.loads(bytes.decode(request.body))
     try:
         result_temp = []
-        for p in BawangcanAward.objects.raw(
-                "select a.award_user_id,a.award_time,a.award_activity_id,b.activity_id,b.activity_type "
-                "from bawangcan_bawangcanaward as a left OUTER JOIN bawangcan_bawangcanactivity as b "
-                "where a.award_user_id = '{}' and a.award_activity_id=b.activity_id".format(
-                    body_temp['user_id'])):
-            temp_dict = {'award_time': p.award_time, 'award_type': p.activity_type}
-            result_temp.append(temp_dict)
-        return HttpResponse(json.dumps({'code': 0000, 'msg': '查询成功', 'data': result_temp}))
+        with connection.cursor() as cursor:
+            cursor.execute("select a.award_user_id,a.award_time,a.award_activity_id,b.activity_id,b.activity_type "
+                           "from bawangcan_bawangcanaward as a left OUTER JOIN bawangcan_bawangcanactivity as b "
+                           "where a.award_user_id = '{}' and a.award_activity_id=b.activity_id".format(
+                body_temp['user_id']))
+            temp_list = NamedTupleFetch.namedtuplefetchall(cursor=cursor)
+            for p in temp_list:
+                temp_dict = {'award_time': p.award_time, 'award_type': p.activity_type}
+                result_temp.append(temp_dict)
+
+            return HttpResponse(json.dumps({'code': 0000, 'msg': '查询成功', 'data': result_temp}))
     except Exception as e:
         return HttpResponse(json.dumps({'code': 1001, 'msg': '查询失败'}))
