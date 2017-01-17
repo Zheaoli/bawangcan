@@ -30,12 +30,13 @@
 #     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #               佛祖保佑         永无BUG
+import datetime
+import hashlib
+
 from bawangcan.models import User
 from bawangcan.utils.DataBase import RedisBase
-import hashlib
 from conf.MyRedis import *
 from .ConvertTime import str_to_num
-import datetime
 
 
 class UserAuth(object):
@@ -44,7 +45,7 @@ class UserAuth(object):
         try:
             usertable = User.objects.get(user_email=user['email'])
         except:
-            return 10302, '用户不存在'
+            return 10302, '用户不存在', None
         pwd = hashlib.md5()
         pwd.update(str.encode("{}_{}_{}".format(user['name'], user['email'], user['password'])))
         if usertable.user_password == pwd.hexdigest():
@@ -56,4 +57,4 @@ class UserAuth(object):
             redis_client.connection.expire(time=10000, name=usertable.user_id)
             return 0000, key_client.hexdigest(), usertable.user_id
         else:
-            return 10303, '密码错误',None
+            return 10303, '密码错误', None

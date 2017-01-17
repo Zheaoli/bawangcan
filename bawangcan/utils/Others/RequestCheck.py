@@ -47,10 +47,11 @@ def check_key(keyword=None):
             re = {}
             if request.method == "POST":
                 temp_dict = json.loads(bytes.decode(request.body))
+                # print(temp_dict)
                 if keyword is not None:
                     if 'key' in temp_dict and 'user_id' in temp_dict and keyword in temp_dict:
                         redis_client = RedisBase.RedisBase(host=host, port=port, database=db)
-                        temp_check = redis_client.connection.get(temp_dict['email'].strip())
+                        temp_check = redis_client.connection.get(temp_dict['user_id'].strip())
                         if temp_check is None:
                             re['code'] = 56789
                             re['msg'] = 'key已经失效，请重新登陆'
@@ -58,8 +59,8 @@ def check_key(keyword=None):
                         elif temp_dict['key'] == bytes.decode(temp_check):
                             return func(request, *args, **kwargs)
                     else:
-                        re['code'] = 12345
-                        re['msg'] = '请带上 email 和 user_id'
+                        re['code'] = 123451
+                        re['msg'] = '请带上 email 和 user_id`'
                         return HttpResponse(json.dumps(re), content_type="application/json")
                 else:
                     if 'key' in temp_dict and 'user_id' in temp_dict:
@@ -89,6 +90,6 @@ def check_key(keyword=None):
 def sql_check(func):
     @wraps(func)
     def wrap(request: request1, *args, **kwargs):
-        func(request1, *args, **kwargs)
+        return func(request, *args, **kwargs)
 
     return wrap

@@ -26,7 +26,7 @@ from bawangcan.utils.Others import RequestCheck
 @RequestCheck.sql_check
 def join_activity(request: request1):
     """
-
+    用户参与活动视图
     :param request:
     :return:
     """
@@ -34,15 +34,18 @@ def join_activity(request: request1):
     user_id = body_temp['user_id']
     with connection.cursor() as cursor:
         try:
+            # 开启事务
             cursor.execute("set autocommit=0")
-            cursor.execute("Begin Transaction")
+            cursor.execute("START TRANSACTION")
             user_object = None
             temp_flag = cursor.execute(
-                "update bawangcan_user set user_money=user_money-1 where user_id={} and user_money > 1".format(user_id))
+                "update bawangcan_user set user_money=user_money-1 where user_id='{}' and user_money > 1".format(
+                    user_id))
             if temp_flag == 0:
                 raise ValueError("余额错误")
             activity_flag = None
-            if body_temp['activity_id'] == 0:
+            # 获取可用活动
+            if body_temp['activity_type'] == 0:
                 for p in BawangcanStatus.objects.raw(
                         "SELECT * FROM bawangcan_bawangcanstatus"
                         " WHERE status_type=0 AND status_count<20 AND status_status=0 FOR UPDATE "):
@@ -52,43 +55,49 @@ def join_activity(request: request1):
                         "SELECT * FROM bawangcan_bawangcanstatus "
                         "WHERE status_type=1 AND status_count<200 AND status_status=0 FOR UPDATE "):
                     activity_flag = p
+            # 没有则创建
             if activity_flag is None:
                 activity_id_hash = hashlib.sha1()
-                activity_id_hash.update(str.encode("{}_{}".format(user_object.user_id, str(
+                activity_id_hash.update(str.encode("{}_{}".format(user_id, str(
                     ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))))))
                 time_map = ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 cursor.execute("insert into bawangcan_bawangcanactivity (activity_time,activity_type,"
-                               "activity_id) values({},{},{})".format(time_map,
-                                                                      body_temp['activity_type'],
-                                                                      activity_id_hash.hexdigest()))
+                               "activity_id) values({},{},'{}')".format(time_map,
+                                                                        body_temp['activity_type'],
+                                                                        activity_id_hash.hexdigest()))
                 cursor.execute(
                     "insert into bawangcan_bawangcanstatus (status_activity_id,status_start_time,"
-                    "status_count,status_status,status_type) values({}.{}.{}.{}.{})".format(
+                    "status_count,status_status,status_type) values('{}',{},{},{},{})".format(
                         activity_id_hash.hexdigest(), time_map, 1, 0, body_temp['activity_type']))
                 cursor.execute(
                     "insert into bawangcan_bawangcanrecord (record_activity_id,"
-                    "record_create_time,record_user_id) VALUES ({},{},{})".format(
+                    "record_create_time,record_user_id) VALUES ('{}',{},'{}')".format(
                         activity_id_hash.hexdigest(), time_map, body_temp['user_id']))
+            # 有则更新
             else:
                 time_map = ConvertTime.str_to_num(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                if body_temp['activity_id'] == 1 and (activity_flag.status_count + 1) == 200:
-                    cursor.execute("update set status_end_time={},status_count=200,status_status=1 where "
-                                   "status_activity_id=".format(time_map))
-                elif body_temp['activity_id'] == 0 and (activity_flag.status_count + 1) == 20:
-                    cursor.execute("update set status_end_time={},status_count=200,status_status=1 where "
-                                   "status_activity_id=".format(time_map))
+                if body_temp['activity_type'] == 1 and (activity_flag.status_count + 1) == 200:
+                    cursor.execute(
+                        "update bawangcan_bawangcanstatus set status_end_time={},status_count=200,status_status=1 where "
+                        "status_activity_id='{}'".format(time_map, activity_flag.status_activity_id))
+                elif body_temp['activity_type'] == 0 and (activity_flag.status_count + 1) == 20:
+                    cursor.execute(
+
+                        "update bawangcan_bawangcanstatus set status_end_time={},status_count=200,status_status=1 where "
+                        "status_activity_id='{}'".format(time_map, activity_flag.status_activity_id))
                 else:
-                    cursor.execute("update set status_count={} where "
-                                   "status_activity_id=".format(activity_flag.status_count + 1))
+                    cursor.execute("update bawangcan_bawangcanstatus set status_count={} where "
+                                   "status_activity_id='{}'".format(activity_flag.status_count + 1,
+                                                                    activity_flag.status_activity_id))
                 cursor.execute(
                     "insert into bawangcan_bawangcanrecord (record_activity_id,record_create_time,record_user_id)"
-                    " VALUES({},{},{})".format(
-                        activity_flag.activity_id, time_map, body_temp['user_id']))
+                    " VALUES('{}',{},'{}')".format(
+                        activity_flag.status_activity_id, time_map, body_temp['user_id']))
         except Exception as e:
-            cursor.execute("ROLLBACK Transaction")
+            cursor.execute("ROLLBACK")
+            cursor.execute("set autocommit=1")
             return HttpResponse(json.dumps({'code': 1001, 'msg': '活动参加失败'}))
         else:
-            cursor.execute('Commit Transaction')
-            return HttpResponse(json.dumps({'code': 0000, 'msg': '成功'}))
-        finally:
+            cursor.execute('Commit')
             cursor.execute("set autocommit=1")
+            return HttpResponse(json.dumps({'code': 0000, 'msg': '成功'}))

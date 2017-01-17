@@ -18,6 +18,11 @@ from bawangcan.utils.Others import Auth
 
 @csrf_exempt
 def user_login(request: request1):
+    """
+    用户登陆视图
+    :param request:
+    :return:
+    """
     re = {'code': 9999}
     if request.method == "POST":
         try:
@@ -45,13 +50,10 @@ def user_login(request: request1):
                 re['user_id'] = user_id
             else:
                 re['msg'] = result
-                re['key'] = None
-                re['user_id'] = None
             return HttpResponse(json.dumps(re), content_type='application/json')
         except Exception as e:
-            print(e)
+            return HttpResponse(json.dumps({'code': 1001, 'msg': '登录失败'}))
     else:
         re['code'] = 23333
         re['msg'] = '请用POST方法'
-        re['key'] = None
         return HttpResponse(json.dumps(re), content_type='application/json')

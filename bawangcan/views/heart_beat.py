@@ -25,6 +25,11 @@ from conf.MyRedis import *
 @csrf_exempt
 @RequestCheck.check_key('user_id')
 def heart_beat(request: request1):
+    """
+    心跳链接，实时更新key
+    :param request:
+    :return:
+    """
     body_temp = json.dumps(request.body)
     key_client = hashlib.md5()
     key_client.update(str.encode('{}_{}'.format(body_temp['user_id'], str(
